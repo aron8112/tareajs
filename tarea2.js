@@ -159,3 +159,15 @@ carrito.agregarProducto("UI999TY", 2);
 setTimeout(() => {
   console.log(carrito);
 }, 3000);
+
+setTimeout(() => {
+  carrito
+    .eliminarProducto("WE328NJ", 2)
+    .then((mensaje) => {
+      console.log(mensaje);
+      console.log(carrito);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}, 4000);
