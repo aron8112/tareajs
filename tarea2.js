@@ -1,30 +1,3 @@
-/*
-En el archivo tarea2.js podemos encontrar un código de un supermercado que vende productos.
-El código contiene 
-    - una clase Producto que representa un producto que vende el super
-    - una clase Carrito que representa el carrito de compras de un cliente
-    - una clase ProductoEnCarrito que representa un producto que se agrego al carrito
-    - una función findProductBySku que simula una base de datos y busca un producto por su sku
-El código tiene errores y varias cosas para mejorar / agregar
-​
-Ejercicios
-1) Arreglar errores existentes en el código
-    a) Al ejecutar agregarProducto 2 veces con los mismos valores debería agregar 1 solo producto con la suma de las cantidades.    
-    b) Al ejecutar agregarProducto debería actualizar la lista de categorías solamente si la categoría no estaba en la lista.
-    c) Si intento agregar un producto que no existe debería mostrar un mensaje de error.
-​
-2) Agregar la función eliminarProducto a la clase Carrito
-    a) La función eliminarProducto recibe un sku y una cantidad (debe devolver una promesa)
-    b) Si la cantidad es menor a la cantidad de ese producto en el carrito, se debe restar esa cantidad al producto
-    c) Si la cantidad es mayor o igual a la cantidad de ese producto en el carrito, se debe eliminar el producto del carrito
-    d) Si el producto no existe en el carrito, se debe mostrar un mensaje de error
-    e) La función debe retornar una promesa
-​
-3) Utilizar la función eliminarProducto utilizando .then() y .catch()
-​
-*/
-
-
 // Cada producto que vende el super es creado con esta clase
 class Producto {
     sku;            // Identificador único del producto
@@ -80,19 +53,30 @@ class Carrito {
     /**
      * función que agrega @{cantidad} de productos con @{sku} al carrito
      */
+
     async agregarProducto(sku, cantidad) {
-        console.log(`Agregando ${cantidad} ${sku}`);
+        try {
+            // Busco el producto en la "base de datos"
+            const producto = await findProductBySku(sku);
+            // console.log("Producto encontrado", producto);
 
-        // Busco el producto en la "base de datos"
-        const producto = await findProductBySku(sku);
+            const prodExist = this.productos.find(p => p.sku === sku);
 
-        console.log("Producto encontrado", producto);
-
-        // Creo un producto nuevo
-        const nuevoProducto = new ProductoEnCarrito(sku, producto.nombre, cantidad);
-        this.productos.push(nuevoProducto);
-        this.precioTotal = this.precioTotal + (producto.precio * cantidad);
-        this.categorias.push(producto.categoria);
+            if (prodExist) {
+                prodExist.cantidad += cantidad;
+            } else {
+                // Creo un producto nuevo
+                const nuevoProducto = new ProductoEnCarrito(sku, producto.nombre, cantidad);
+                this.productos.push(nuevoProducto);
+                if (!this.categorias.includes(producto.categoria)) {
+                    this.categorias.push(producto.categoria);
+                }
+            }
+            this.precioTotal = this.precioTotal + (producto.precio * cantidad);
+            //console.log(`Agregando ${cantidad} ${sku}`);
+        } catch (error) {
+            console.log('Error: ' + error)
+        }
     }
 }
 
@@ -126,3 +110,14 @@ function findProductBySku(sku) {
 
 const carrito = new Carrito();
 carrito.agregarProducto('WE328NJ', 2);
+// carrito.agregarProducto('WE328NJ', 5);
+carrito.agregarProducto('UI999TY', 2);
+// carrito.agregarProducto('UI999TY', 3);
+
+//carrito.agregarProducto('WE555NJ', 2);
+setTimeout(() => {
+    console.log(carrito)
+}, 3000)
+
+
+
